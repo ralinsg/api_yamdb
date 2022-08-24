@@ -18,9 +18,9 @@ class CategoryViewSet(MyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permissions_classes = (IsAuthorOrReadOnly, )
+    filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
     pagination_class = LimitOffsetPagination
-
 
 class GenreViewSet(MyViewSet):
 
@@ -32,6 +32,7 @@ class GenreViewSet(MyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permissions_classes = (IsAuthorOrReadOnly, )
+    filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
     pagination_class = LimitOffsetPagination
 
@@ -47,6 +48,6 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['category', 'genre', 'name', 'year']
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('category', 'genre', 'name', 'year', )
     pagination_class = LimitOffsetPagination

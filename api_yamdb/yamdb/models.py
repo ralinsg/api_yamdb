@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 
 class User(AbstractUser):
@@ -44,6 +44,8 @@ class User(AbstractUser):
 class Category(models.Model):
     name = models.CharField(
         max_length=256,
+        blank=False,
+        null=False,
         verbose_name='Название'
     )
     slug = models.SlugField(
@@ -52,8 +54,13 @@ class Category(models.Model):
         verbose_name='Уникальное имя'
     )
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ('pk', )
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
 
 class Genre(models.Model):
@@ -67,8 +74,13 @@ class Genre(models.Model):
         verbose_name='Уникальное имя'
     )
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ('pk', )
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
 
 
 class Title(models.Model):
@@ -90,6 +102,7 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
+        blank=True,
         related_name='genres',
         verbose_name='Жанр'
     )
@@ -102,5 +115,10 @@ class Title(models.Model):
         blank=True
     )
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ('pk', )
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведение'

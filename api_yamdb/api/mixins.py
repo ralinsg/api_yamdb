@@ -2,7 +2,7 @@ from rest_framework import mixins, viewsets
 
 
 class MyViewSet(
-    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet

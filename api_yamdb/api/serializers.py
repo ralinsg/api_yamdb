@@ -3,23 +3,17 @@ from yamdb.models import Category, Genre, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    slug = serializers.SlugRelatedField(
-        slug_field='categories',
-        read_only=True,
-        many=True
-    )
 
     class Meta:
-        fields = '__all__'
         model = Category
+        exclude = ('id',)
+        lookup_field = 'slug'
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugRelatedField(
-        slug_field='genres',
-        read_only=True,
-        many=True
-    )
 
     class Meta:
         fields = '__all__'
