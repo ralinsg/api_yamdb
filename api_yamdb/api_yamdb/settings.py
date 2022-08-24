@@ -22,8 +22,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api',
     'rest_framework',
+    'api',
+    'yamdb'
 ]
 
 MIDDLEWARE = [
@@ -122,4 +123,4 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-AUTH_USER_MODEL = 'api.User'
+AUTH_USER_MODEL = 'yamdb.User'
