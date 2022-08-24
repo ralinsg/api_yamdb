@@ -87,8 +87,7 @@ class Title(models.Model):
         max_length=256,
         verbose_name='Название'
     )
-    year = models.DateTimeField(
-        auto_now_add=True,
+    year = models.IntegerField(
         verbose_name='Год выпуска'
     )
     rating = models.IntegerField(
@@ -103,7 +102,6 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
-        blank=True,
         related_name='genres',
         verbose_name='Жанр'
     )
@@ -112,8 +110,7 @@ class Title(models.Model):
         on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='Категория',
-        null=True,
-        blank=True
+        null=True
     )
 
     def __str__(self):
