@@ -20,7 +20,7 @@ class CategoryViewSet(MyViewSet):
     permissions_classes = (IsAuthorOrReadOnly, )
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
-    pagination_class = LimitOffsetPagination
+
 
 class GenreViewSet(MyViewSet):
 
@@ -34,7 +34,6 @@ class GenreViewSet(MyViewSet):
     permissions_classes = (IsAuthorOrReadOnly, )
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
-    pagination_class = LimitOffsetPagination
 
 
 class TitleViewSet(viewsets.ModelViewSet):

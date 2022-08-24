@@ -44,7 +44,6 @@ class User(AbstractUser):
 class Category(models.Model):
     name = models.CharField(
         max_length=256,
-        blank=False,
         null=False,
         verbose_name='Название'
     )
@@ -94,10 +93,12 @@ class Title(models.Model):
     )
     rating = models.IntegerField(
         verbose_name='Рейтинг',
-        null=True
+        null=True,
+        default=None
     )
     description = models.TextField(
         verbose_name='Описание',
+        null=True,
         blank=True
     )
     genre = models.ManyToManyField(
