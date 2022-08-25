@@ -2,6 +2,20 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+SCORES = [
+    (1, '1'),
+    (2, '2'),
+    (3, '3'),
+    (4, '4'),
+    (5, '5'),
+    (6, '6'),
+    (7, '7'),
+    (8, '8'),
+    (9, '9'),
+    (10, '10'),
+]
+
+
 class User(AbstractUser):
     USER = 'user'
     ADMIN = 'admin'
@@ -120,3 +134,24 @@ class Title(models.Model):
         ordering = ('pk', )
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведение'
+
+
+class Reviews(models.Model):
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE, related_name='review')
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='review')
+    text = models.TextField()
+    score = models.PositiveSmallIntegerField(choices=SCORES)
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True)
+
+
+class Comments(models.Model):
+    review = models.ForeignKey(
+        Reviews, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True)

@@ -1,10 +1,10 @@
-from api.mixins import MyViewSet
+from api.mixins import MyViewSet, UpdateModelMixin
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (CategorySerializer, GenreSerializer,
-                             TitleSerializer)
-from rest_framework import filters, viewsets
+                             TitleSerializer, ReviewSerializer, CommentSerializer)
+from rest_framework import filters, viewsets, mixins
 from rest_framework.pagination import LimitOffsetPagination
-from yamdb.models import Category, Genre, Title
+from yamdb.models import Category, Comments, Genre, Reviews, Title
 
 
 class CategoryViewSet(MyViewSet):
@@ -50,3 +50,24 @@ class TitleViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter, )
     search_fields = ('category', 'genre', 'name', 'year', )
     pagination_class = LimitOffsetPagination
+
+
+class ReviewCommentViewSet(
+    mixins.CreateModelMixin, mixins.RetrieveModelMixin,
+    mixins.ListModelMixin, mixins.DestroyModelMixin, UpdateModelMixin, 
+    viewsets.GenericViewSet):
+    pass 
+
+
+class ReviewViewSet(ReviewCommentViewSet):
+    """"""
+
+    queryset = Reviews.objects.all()
+    serializer_class = ReviewSerializer
+
+
+class CommentViewSet(ReviewCommentViewSet):
+    """"""
+    
+    queryset = Comments.objects.all()
+    serializer_class = CommentSerializer
