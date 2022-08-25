@@ -83,6 +83,8 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class CategoryViewSet(MyViewSet):
 
     """Получение списка всех категорий.
@@ -93,9 +95,12 @@ class CategoryViewSet(MyViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permissions_classes = (IsAdminOrReadOnly)
+    permissions_classes = (IsAdminOrReadOnly, )
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
+    lookup_field = "slug"
+    pagination_class = LimitOffsetPagination
+
 
 class GenreViewSet(MyViewSet):
 
@@ -109,6 +114,8 @@ class GenreViewSet(MyViewSet):
     permissions_classes = (IsAdminOrReadOnly, )
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
+    lookup_field = 'slug'
+    pagination_class = LimitOffsetPagination
 
 
 class TitleViewSet(viewsets.ModelViewSet):
