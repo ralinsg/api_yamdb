@@ -40,6 +40,7 @@ class User(AbstractUser):
         return self.username
 
 
+
 class Token(models.Model):
     user = models.ForeignKey(
         User,
