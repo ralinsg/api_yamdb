@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from reviews.validators import validate_year
 
 
 SCORES = [
@@ -33,7 +34,6 @@ class User(AbstractUser):
     )
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
-        unique=True,
     )
     bio = models.TextField(
         verbose_name='Биография',
@@ -55,15 +55,38 @@ class User(AbstractUser):
         return self.username
 
 
+class Token(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='token',
+    )
+    token = models.CharField(
+        max_length=200,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'token'],
+                name='unique_token'
+            )
+        ]
+        verbose_name = 'Код подтверждения'
+        verbose_name_plural = 'Коды подтверждения'
+
+
 class Category(models.Model):
     name = models.CharField(
         max_length=256,
-        null=False,
-        verbose_name='Название'
+        verbose_name='Название',
+        db_index=True,
+        unique=True
     )
     slug = models.SlugField(
         max_length=50,
         unique=True,
+        blank=True,
         verbose_name='Уникальное имя'
     )
 
@@ -71,7 +94,6 @@ class Category(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('pk', )
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
@@ -88,10 +110,9 @@ class Genre(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return f'{self.name} {self.name}'
 
     class Meta:
-        ordering = ('pk', )
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
@@ -102,7 +123,8 @@ class Title(models.Model):
         verbose_name='Название'
     )
     year = models.IntegerField(
-        verbose_name='Год выпуска'
+        verbose_name='Год выпуска',
+        validators=[validate_year]
     )
     rating = models.IntegerField(
         verbose_name='Рейтинг',
@@ -131,7 +153,6 @@ class Title(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('pk', )
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведение'
 

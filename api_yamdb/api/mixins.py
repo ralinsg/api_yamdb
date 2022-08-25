@@ -1,11 +1,10 @@
 from rest_framework import mixins, viewsets
 from rest_framework.exceptions import MethodNotAllowed
 
-
 class MyViewSet(
-    mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
     viewsets.GenericViewSet
 ):
 
