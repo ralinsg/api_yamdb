@@ -19,7 +19,6 @@ class User(AbstractUser):
     )
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
-        unique=True,
     )
     bio = models.TextField(
         verbose_name='Биография',
@@ -40,3 +39,23 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+
+class Token(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='token',
+    )
+    token = models.CharField(
+        max_length=200,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'token'],
+                name='unique_token'
+            )
+        ]
+        verbose_name = 'Код подтверждения'
+        verbose_name_plural = 'Коды подтверждения'
