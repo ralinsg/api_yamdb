@@ -1,5 +1,6 @@
 from api.mixins import MyViewSet
-from api.permissions import IsAdminOrReadOnly, IsAdminOrSuperUser, IsAdmin
+from api.permissions import (IsAdmin, IsAdminOrModerator, IsAdminOrReadOnly,
+                             IsAdminOrSuperUser, IsModerator)
 from api.serializers import (CategorySerializer, GenreSerializer,
                              JWTokenSerializer, ProfileSerializer,
                              SignUpSerializer, TitleSerializer, UserSerializer)
@@ -111,12 +112,17 @@ class GenreViewSet(MyViewSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permissions_classes = (IsAdminOrReadOnly, )
     filter_backends = (filters.SearchFilter, )
+    permission_classes = (IsAdminOrReadOnly, )
     search_fields = ('name', )
     lookup_field = 'slug'
     pagination_class = LimitOffsetPagination
-    
+
+    def get_permissions(self):
+        if self.action == 'post':
+            return (IsAdminOrModerator(),)
+        return super().get_permissions()
+
 
 class TitleViewSet(viewsets.ModelViewSet):
 
@@ -129,7 +135,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permissions_classes = (IsAdminOrSuperUser,)
+    permissions_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('category', 'genre', 'name', 'year',)
     pagination_class = LimitOffsetPagination
