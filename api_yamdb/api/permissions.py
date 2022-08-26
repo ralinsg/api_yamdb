@@ -17,15 +17,15 @@ class IsModerator(permissions.BasePermission):
         return (request.user.is_authenticated and user.role == 'moderator')
 
 
-class IsAdminOrReadOnly(permissions.BasePermission):
+class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
                 and request.user.is_authenticated
                 and request.user.role == 'admin')
 
 
-class IsAdmin(permissions.BasePermission):
+class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
-                or (request.user.is_authenticated and (
-                    request.request.user.role == 'admin' and request.user.is_superuser)))
+                or (request.user.is_authenticated
+                and request.user.role == 'admin'))
