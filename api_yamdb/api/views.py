@@ -116,7 +116,7 @@ class GenreViewSet(MyViewSet):
     search_fields = ('name', )
     lookup_field = 'slug'
     pagination_class = LimitOffsetPagination
-
+    
 
 class TitleViewSet(viewsets.ModelViewSet):
 
