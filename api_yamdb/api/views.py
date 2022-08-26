@@ -1,5 +1,5 @@
 from api.mixins import MyViewSet
-from api.permissions import IsAdminOrReadOnly, IsAdminOrSuperUser
+from api.permissions import IsAdminOrReadOnly, IsAdminOrSuperUser, IsAdmin
 from api.serializers import (CategorySerializer, GenreSerializer,
                              JWTokenSerializer, ProfileSerializer,
                              SignUpSerializer, TitleSerializer, UserSerializer)
@@ -63,7 +63,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            return (IsAdminOrReadOnly(),)
+            return (IsAdmin(),)
         return super().get_permissions()
 
     @action(
@@ -95,7 +95,7 @@ class CategoryViewSet(MyViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permissions_classes = (IsAdminOrReadOnly, )
+    permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
     lookup_field = "slug"
