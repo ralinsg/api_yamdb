@@ -1,5 +1,5 @@
 from api.mixins import MyViewSet
-from api.permissions import IsAdminOrReadOnly, IsAdminOrSuperUser
+from api.permissions import IsAdminOrReadOnly, IsAdminOrSuperUser, IsAdmin
 from api.serializers import (CategorySerializer, GenreSerializer,
                              JWTokenSerializer, ProfileSerializer,
                              SignUpSerializer, TitleSerializer, UserSerializer)
@@ -95,7 +95,7 @@ class CategoryViewSet(MyViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permissions_classes = (IsAdminOrReadOnly, )
+    permissions_classes = (IsAdmin, )
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
     lookup_field = "slug"
