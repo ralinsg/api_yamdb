@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from reviews.models import User, Category, Genre, Title
 from rest_framework.validators import UniqueValidator
+from reviews.models import Category, Genre, Title, User
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -76,15 +76,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        exclude = ('id',)
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        exclude = ('id',)
-
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
 
 class TitleSerializer(serializers.ModelSerializer):
 

@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'api',
     'reviews',
     'django_filters',
@@ -124,7 +125,6 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 
 }
-
 
 
 SIMPLE_JWT = {

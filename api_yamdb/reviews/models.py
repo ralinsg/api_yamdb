@@ -65,14 +65,11 @@ class Token(models.Model):
 class Category(models.Model):
     name = models.CharField(
         max_length=256,
-        verbose_name='Название',
-        db_index=True,
-        unique=True
+        verbose_name='Название'
     )
     slug = models.SlugField(
         max_length=50,
         unique=True,
-        blank=True,
         verbose_name='Уникальное имя'
     )
 
@@ -96,7 +93,7 @@ class Genre(models.Model):
     )
 
     def __str__(self):
-        return f'{self.name} {self.name}'
+        return self.name
 
     class Meta:
         verbose_name = 'Жанр'
@@ -111,11 +108,6 @@ class Title(models.Model):
     year = models.IntegerField(
         verbose_name='Год выпуска',
         validators=[validate_year]
-    )
-    rating = models.IntegerField(
-        verbose_name='Рейтинг',
-        null=True,
-        default=None
     )
     description = models.TextField(
         verbose_name='Описание',
