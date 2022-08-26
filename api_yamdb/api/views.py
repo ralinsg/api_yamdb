@@ -123,6 +123,7 @@ class GenreViewSet(MyViewSet):
             return (IsAdminOrModerator(),)
         return super().get_permissions()
 
+
 class TitleViewSet(viewsets.ModelViewSet):
 
     """Получение списка всех произведений.
@@ -134,7 +135,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permissions_classes = (IsAdminOrSuperUser,)
+    permissions_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('category', 'genre', 'name', 'year',)
     pagination_class = LimitOffsetPagination

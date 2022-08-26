@@ -2,7 +2,6 @@ from rest_framework import permissions
 
 
 class IsAdminOrSuperUser(permissions.BasePermission):
-
     def has_permission(self, request, view):
         return (request.user.is_authenticated
                 and (request.user.role == 'admin'
@@ -10,7 +9,6 @@ class IsAdminOrSuperUser(permissions.BasePermission):
 
 
 class IsModerator(permissions.BasePermission):
-
     def has_permission(self, request, view):
         return (request.user.is_authenticated
                 and request.user.role == 'moderator')
@@ -33,7 +31,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 class IsAdminOrModerator(permissions.BasePermission):
     def has_permission(self, request, view):
         return (
-                request.method in permissions.SAFE_METHODS
-                and (request.user.role == 'moderator'
-                     or request.user.role == 'admin')
+            request.method in permissions.SAFE_METHODS
+            and (request.user.role == 'moderator'
+                 or request.user.role == 'admin')
         )
