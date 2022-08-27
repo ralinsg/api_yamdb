@@ -1,23 +1,31 @@
 from rest_framework import permissions
-from reviews.models import User
+
+SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
+
+
+class IsAuthenticatedOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if (request.method in SAFE_METHODS
+            or request.user
+                and request.user.is_authenticated()):
+            return True
+        return False
 
 
 class IsAdminOrSuperUser(permissions.BasePermission):
-
     def has_permission(self, request, view):
-        user = User.objects.get(username=request.user.username)
         return (request.user.is_authenticated
-                and (user.role == 'admin' or request.user.is_superuser))
+                and (request.user.role == 'admin'
+                     or request.user.is_superuser))
 
 
 class IsModerator(permissions.BasePermission):
-
     def has_permission(self, request, view):
-        user = User.objects.get(username=request.user.username)
-        return (request.user.is_authenticated and user.role == 'moderator')
+        return (request.user.is_authenticated
+                and request.user.role == 'moderator')
 
 
-class IsAdminOrReadOnly(permissions.BasePermission):
+class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
                 and request.user.is_authenticated
@@ -46,3 +54,26 @@ class IsAuthorOrAdminOrModeratorOrReadOnly(permissions.BasePermission):
             or request.user.role == 'admin'
             or request.user.role == 'moderator'
         )
+
+
+class IsAdminOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return (request.method in permissions.SAFE_METHODS
+                or (request.user.is_authenticated
+                    and request.user.role == 'admin'))
+
+
+class IsAdminOrModerator(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.method in permissions.SAFE_METHODS
+            and (request.user.role == 'moderator'
+                 or request.user.role == 'admin'))
+
+
+class IsAdminOrModerator(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.method in permissions.SAFE_METHODS
+            and (request.user.role == 'moderator'
+                 or request.user.role == 'admin'))

@@ -1,13 +1,16 @@
+from api.filters import GenreFilter
 from api.mixins import MyViewSet, UpdateModelMixin
-from api.permissions import (IsAdminOrReadOnly, IsAdminOrSuperUser,
+from api.permissions import (IsAdmin, IsAdminOrModerator, IsAdminOrReadOnly,
+                             IsAdminOrSuperUser, IsAuthenticatedOrReadOnly,
                              IsAuthorOrAdminOrModeratorOrReadOnly)
 from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, JWTokenSerializer,
-                             ProfileSerializer, ReviewSerializer,
+                             ProfileSerializer, ReviewSerializer, ReadTitleSerializer,
                              SignUpSerializer, TitleSerializer, UserSerializer)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
@@ -65,7 +68,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            return (IsAdminOrReadOnly(),)
+            return (IsAdmin(),)
         return super().get_permissions()
 
     @action(
@@ -97,9 +100,12 @@ class CategoryViewSet(MyViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permissions_classes = (IsAdminOrReadOnly)
+    permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
+    lookup_field = "slug"
+    pagination_class = LimitOffsetPagination
+
 
 
 class GenreViewSet(MyViewSet):
@@ -111,9 +117,16 @@ class GenreViewSet(MyViewSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permissions_classes = (IsAdminOrReadOnly, )
     filter_backends = (filters.SearchFilter, )
+    permission_classes = (IsAdminOrReadOnly, )
     search_fields = ('name', )
+    lookup_field = 'slug'
+    pagination_class = LimitOffsetPagination
+
+    def get_permissions(self):
+        if self.action == 'post':
+            return (IsAdminOrModerator(),)
+        return super().get_permissions()
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -127,10 +140,21 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permissions_classes = (IsAdminOrSuperUser,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('category', 'genre', 'name', 'year',)
+    filter_backends = (DjangoFilterBackend,)
+    permission_classes = (IsAdminOrReadOnly, )
+    filterset_class = GenreFilter
+    filterset_fields = ('slug',)
     pagination_class = LimitOffsetPagination
+
+    def get_serializer_class(self):
+        if self.action in ('retrieve', 'list'):
+            return ReadTitleSerializer
+        return TitleSerializer
+
+    def get_permissions(self):
+        if self.action == 'post':
+            return (IsAuthenticatedOrReadOnly,)
+        return super().get_permissions()
 
 
 class ReviewCommentViewSet(
