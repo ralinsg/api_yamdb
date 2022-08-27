@@ -159,20 +159,59 @@ class Title(models.Model):
 
 class Reviews(models.Model):
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name='review')
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Произведение'
+    )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='review')
-    text = models.TextField()
-    score = models.PositiveSmallIntegerField(choices=SCORES)
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Автор отзыва'
+    )
+    text = models.TextField('Текст отзыва')
+    score = models.PositiveSmallIntegerField(
+        choices=SCORES,
+        verbose_name='Оценка'
+    )
     pub_date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        'Дата добавления',
+        auto_now_add=True,
+        db_index=True
+    )
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
 
 
 class Comments(models.Model):
     review = models.ForeignKey(
-        Reviews, on_delete=models.CASCADE, related_name='comments')
+        Reviews,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Отзыв'
+    )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments')
-    text = models.TextField()
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Автор комментария'
+    )
+    text = models.TextField('Текст комментария')
     pub_date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        'Дата добавления',
+        auto_now_add=True,
+        db_index=True
+    )
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'

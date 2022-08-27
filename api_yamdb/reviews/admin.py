@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Token, Category, Genre, Title
+from .models import Comments, Reviews, User, Token, Category, Genre, Title
 
 
 class TokenAdmin(admin.ModelAdmin):
@@ -18,3 +18,5 @@ admin.site.register(Token, TokenAdmin)
 admin.site.register(Category)
 admin.site.register(Genre)
 admin.site.register(Title)
+admin.site.register(Reviews)
+admin.site.register(Comments)
