@@ -1,10 +1,6 @@
 from django.contrib import admin
-<<<<<<< HEAD
-from .models import Comments, Reviews, User, Token, Category, Genre, Title
-=======
 
-from .models import Category, Genre, Title, Token, User
->>>>>>> master
+from .models import Category, Comments, Genre, Reviews, Title, Token, User
 
 
 class TokenAdmin(admin.ModelAdmin):

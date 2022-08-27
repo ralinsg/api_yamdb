@@ -1,10 +1,6 @@
 from rest_framework import serializers
-<<<<<<< HEAD
-from reviews.models import Category, Comments, Genre, Title, Reviews, User
-=======
->>>>>>> master
 from rest_framework.validators import UniqueValidator
-from reviews.models import Category, Genre, Title, User
+from reviews.models import Category, Comments, Genre, Reviews, Title, User
 
 
 class SignUpSerializer(serializers.ModelSerializer):
