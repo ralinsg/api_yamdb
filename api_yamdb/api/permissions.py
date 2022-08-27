@@ -69,11 +69,3 @@ class IsAdminOrModerator(permissions.BasePermission):
             request.method in permissions.SAFE_METHODS
             and (request.user.role == 'moderator'
                  or request.user.role == 'admin'))
-
-
-class IsAdminOrModerator(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return (
-            request.method in permissions.SAFE_METHODS
-            and (request.user.role == 'moderator'
-                 or request.user.role == 'admin'))
