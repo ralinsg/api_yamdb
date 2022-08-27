@@ -1,13 +1,16 @@
+from api.filters import GenreFilter
 from api.mixins import MyViewSet
 from api.permissions import (IsAdmin, IsAdminOrModerator, IsAdminOrReadOnly,
-                             IsAdminOrSuperUser, IsModerator)
+                             IsAdminOrSuperUser, IsAuthenticatedOrReadOnly)
 from api.serializers import (CategorySerializer, GenreSerializer,
                              JWTokenSerializer, ProfileSerializer,
-                             SignUpSerializer, TitleSerializer, UserSerializer)
+                             ReadTitleSerializer, SignUpSerializer,
+                             TitleSerializer, UserSerializer)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, status, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, status, viewsets, permissions
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -135,7 +138,18 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permissions_classes = (IsAdminOrReadOnly,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('category', 'genre', 'name', 'year',)
+    filter_backends = (DjangoFilterBackend,)
+    permission_classes = (IsAdminOrReadOnly, )
+    filterset_class = GenreFilter
+    filterset_fields = ('slug',)
     pagination_class = LimitOffsetPagination
+
+    def get_serializer_class(self):
+        if self.action in ("retrieve", "list"):
+            return ReadTitleSerializer
+        return TitleSerializer
+
+    def get_permissions(self):
+        if self.action == 'post':
+            return (IsAuthenticatedOrReadOnly,)
+        return super().get_permissions()
