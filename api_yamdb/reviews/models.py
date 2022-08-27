@@ -149,7 +149,7 @@ class Title(models.Model):
         verbose_name_plural = 'Произведение'
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -165,7 +165,8 @@ class Reviews(models.Model):
     text = models.TextField('Текст отзыва')
     score = models.PositiveSmallIntegerField(
         choices=SCORES,
-        verbose_name='Оценка'
+        verbose_name='Оценка',
+        null=True
     )
     pub_date = models.DateTimeField(
         'Дата добавления',
@@ -179,11 +180,17 @@ class Reviews(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='unique_title_author'
+            )
+        ]
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     review = models.ForeignKey(
-        Reviews,
+        Review,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Отзыв'

@@ -1,8 +1,7 @@
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-<<<<<<< HEAD
-from reviews.models import Category, Comments, Genre, Title, Reviews, User
-=======
->>>>>>> master
+from reviews.models import Category, Comment, Genre, Title, Review, User
 from rest_framework.validators import UniqueValidator
 from reviews.models import Category, Genre, Title, User
 
@@ -123,12 +122,36 @@ class ReadTitleSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
+        read_only=True, slug_field='username',
     )
 
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date')
-        model = Reviews
+        model = Review
+
+    def validate_score(self, value):
+        if value is None or value not in range(1, 11):
+            raise serializers.ValidationError(
+                'Укажите оценку в виде целого числа от 1 до 10')
+        return value
+
+    def validate(self, data):
+        if self.context['request'].method == 'POST':
+            title_id = (
+                self.context['request'].parser_context['kwargs']['title_id']
+            )
+            author = self.context['request'].user
+            try:
+                review = get_object_or_404(
+                    Review, author=author, title=title_id
+                )
+                if review is not None:
+                    raise serializers.ValidationError(
+                        'Пользователь может оставить только 1 отзыв '
+                        'на произведение')
+            except Http404:
+                pass
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -138,4 +161,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
-        model = Comments
+        model = Comment
