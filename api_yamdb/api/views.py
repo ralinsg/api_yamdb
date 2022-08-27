@@ -1,22 +1,23 @@
 from api.filters import GenreFilter
-from api.mixins import MyViewSet
+from api.mixins import MyViewSet, UpdateModelMixin
 from api.permissions import (IsAdmin, IsAdminOrModerator, IsAdminOrReadOnly,
-                             IsAdminOrSuperUser, IsAuthenticatedOrReadOnly)
-from api.serializers import (CategorySerializer, GenreSerializer,
-                             JWTokenSerializer, ProfileSerializer,
-                             ReadTitleSerializer, SignUpSerializer,
-                             TitleSerializer, UserSerializer)
+                             IsAdminOrSuperUser, IsAuthenticatedOrReadOnly,
+                             IsAuthorOrAdminOrModeratorOrReadOnly)
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             GenreSerializer, JWTokenSerializer,
+                             ProfileSerializer, ReviewSerializer, ReadTitleSerializer,
+                             SignUpSerializer, TitleSerializer, UserSerializer)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, permissions, status, viewsets
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Genre, Title, Token, User
+from reviews.models import Category, Genre, Reviews, Title, Token, User
 
 
 @api_view(['POST'])
@@ -106,6 +107,7 @@ class CategoryViewSet(MyViewSet):
     pagination_class = LimitOffsetPagination
 
 
+
 class GenreViewSet(MyViewSet):
 
     """Получение списка всех жанров.
@@ -153,3 +155,69 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action == 'post':
             return (IsAuthenticatedOrReadOnly,)
         return super().get_permissions()
+
+
+class ReviewCommentViewSet(
+    mixins.CreateModelMixin, mixins.RetrieveModelMixin,
+    mixins.ListModelMixin, mixins.DestroyModelMixin, UpdateModelMixin,
+    viewsets.GenericViewSet
+):
+    """Базовый вьюсет для отзывов и комментариев.
+    Доступны методы GET, POST, PATCH, UPDATE, DELETE."""
+
+    pass
+
+
+class ReviewViewSet(ReviewCommentViewSet):
+    """
+    Вьюсет для отзывов. Доступны:
+    Получение списка отзывов к произведению или получение отзыва по id;
+    Добавление новых отзывов;
+    Частичное обновление отзывов;
+    Удаление отзывов.
+    """
+
+    serializer_class = ReviewSerializer
+    permission_classes = (IsAuthorOrAdminOrModeratorOrReadOnly,)
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        # 1 отзыв от пользователя
+        serializer.save(author=self.request.user, title=title)
+
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class CommentViewSet(ReviewCommentViewSet):
+    """
+    Вьюсет для комментариев. Доступны:
+    Получение списка комментариев к отзыву или получение комментария по id;
+    Добавление новых комментариев;
+    Частичное обновление комментария;
+    Удаление комментария.
+    """
+
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthorOrAdminOrModeratorOrReadOnly,)
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Reviews, id=review_id)
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Reviews, id=review_id)
+        serializer.save(author=self.request.user, review=review)
+
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
