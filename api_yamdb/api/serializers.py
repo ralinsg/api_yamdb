@@ -26,7 +26,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("username", "email")
+        fields = ('username', 'email')
 
 
 class JWTokenSerializer(serializers.Serializer):
@@ -37,6 +37,7 @@ class JWTokenSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     """Сериализатор для просмотра списка пользователей,
     добавления, редактирования, удаления отдельного
     пользователя"""
@@ -73,6 +74,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Сериализует данные для получения, добавления и удаления категорий."""
 
     class Meta:
         model = Category
@@ -81,7 +83,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-
+    """Сериализует данные для получения.добавления и удаления жанров."""
     class Meta:
         model = Genre
         fields = ('name', 'slug')
@@ -89,6 +91,11 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+
+    """Сериализует данные для добавления и получени информации о произведении
+    А также для частичного обновления и удаления информации о произведении
+    """
+
     genre = serializers.SlugRelatedField(
         slug_field='slug', many=True, queryset=Genre.objects.all()
     )

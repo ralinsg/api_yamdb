@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import User, Token, Category, Genre, Title
+
+from .models import Category, Genre, Title, Token, User
 
 
 class TokenAdmin(admin.ModelAdmin):
