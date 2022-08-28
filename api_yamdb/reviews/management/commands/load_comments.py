@@ -1,8 +1,6 @@
 import os
 from csv import DictReader
 from django.core.management import BaseCommand
-from django.http import Http404
-from django.shortcuts import get_object_or_404
 from api_yamdb.settings import BASE_DIR
 from reviews.models import Comment, Review, User
 
@@ -37,13 +35,16 @@ class Command(BaseCommand):
 
         # Code to load the data into database
         for line in DictReader(open(comments_data)):
-            try:
-                review = get_object_or_404(Review, pk=line['review_id'])
-                author = get_object_or_404(User, pk=line['author'])
-                comment = Comment(
-                    pk=line['id'], review=review, text=line['text'],
-                    author=author, pub_date=line['pub_date']
-                )
-                comment.save()
-            except Http404:
-                print('Review or author does not exists')
+            review = Review.objects.filter(pk=line['review_id'])
+            if review.exists():
+                author = User.objects.filter(pk=line['author'])
+                if author.exists():
+                    comment = Comment(
+                        pk=line['id'], review=review[0], text=line['text'],
+                        author=author[0], pub_date=line['pub_date']
+                    )
+                    comment.save()
+                else:
+                    print(f'Author with id {line["author"]} does not exists')
+            else:
+                print(f'Review with id {line["review_id"]} does not exists')
