@@ -19,7 +19,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Genre, Reviews, Title, Token, User
+from reviews.models import Category, Genre, Review, Title, Token, User
 
 
 @api_view(['POST'])
@@ -109,7 +109,6 @@ class CategoryViewSet(MyViewSet):
     pagination_class = LimitOffsetPagination
 
 
-
 class GenreViewSet(MyViewSet):
 
     """Получение списка всех жанров.
@@ -191,7 +190,6 @@ class ReviewViewSet(ReviewCommentViewSet):
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
-        # 1 отзыв от пользователя
         serializer.save(author=self.request.user, title=title)
 
     def perform_update(self, serializer):
@@ -213,12 +211,12 @@ class CommentViewSet(ReviewCommentViewSet):
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Reviews, id=review_id)
+        review = get_object_or_404(Review, id=review_id)
         return review.comments.all()
 
     def perform_create(self, serializer):
         review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Reviews, id=review_id)
+        review = get_object_or_404(Review, id=review_id)
         serializer.save(author=self.request.user, review=review)
 
     def perform_update(self, serializer):

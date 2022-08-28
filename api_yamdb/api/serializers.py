@@ -1,6 +1,8 @@
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from reviews.models import Category, Comment, Genre, Title, Review, User
 from rest_framework.validators import UniqueValidator
-from reviews.models import Category, Comments, Genre, Reviews, Title, User
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -90,16 +92,6 @@ class GenreSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 
-class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
-    )
-
-    class Meta:
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
-        model = Reviews
-
-
 class TitleSerializer(serializers.ModelSerializer):
 
     """Сериализует данные для добавления и получени информации о произведении
@@ -130,11 +122,49 @@ class ReadTitleSerializer(serializers.ModelSerializer):
         )
 
 
+class ReviewSerializer(serializers.ModelSerializer):
+    """Сериализатор для отзывов."""
+
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        model = Review
+
+    def validate_score(self, value):
+        if value is None or value not in range(1, 11):
+            raise serializers.ValidationError(
+                'Укажите оценку в виде целого числа от 1 до 10')
+        return value
+
+    def validate(self, data):
+        if self.context['request'].method == 'POST':
+            title_id = (
+                self.context['request'].parser_context['kwargs']['title_id']
+            )
+            author = self.context['request'].user
+            try:
+                review = get_object_or_404(
+                    Review, author=author, title=title_id
+                )
+                if review is not None:
+                    raise serializers.ValidationError(
+                        'Пользователь может оставить только 1 отзыв '
+                        'на произведение')
+            except Http404:
+                pass
+        return data
+
+
 class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор для комментариев."""
+
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
 
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
-        model = Comments
+        model = Comment
