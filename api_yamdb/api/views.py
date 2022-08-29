@@ -67,7 +67,7 @@ class UserViewSet(viewsets.ModelViewSet):
     Редактирование данных отдельного пользователя
     Удаление пользователя
     Получение данных личного профиля
-    Htlfrnbhjdfybt kbxyjuj ghjabkz"""
+    Редактирование личного профиля"""
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
