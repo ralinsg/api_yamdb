@@ -1,8 +1,6 @@
 import os
 from csv import DictReader
 from django.core.management import BaseCommand
-from django.http import Http404
-from django.shortcuts import get_object_or_404
 from api_yamdb.settings import BASE_DIR
 from reviews.models import Category, Genre, Title
 
@@ -38,24 +36,27 @@ class Command(BaseCommand):
 
         # Code to load the data into database
         for line in DictReader(open(titles_data)):
-            try:
-                category = get_object_or_404(Category, pk=line['category'])
+            category = Category.objects.filter(pk=line['category'])
+            if category.exists():
                 title = Title(
                     pk=line['id'], name=line['name'],
-                    year=line['year'], category=category
+                    year=line['year'], category=category[0]
                 )
-            except Http404:
+            else:
                 title = Title(
-                    pk=line['id'], name=line['name'], year=line['year'],
+                    pk=line['id'], name=line['name'], year=line['year']
                 )
             title.save()
 
         print('Loading genres to titles')
         genres_titles_data = os.path.join(DATA_PATH, GENRES_TITLES_FILENAME)
         for line in DictReader(open(genres_titles_data)):
-            try:
-                title = get_object_or_404(Title, pk=line['title_id'])
-                genre = get_object_or_404(Genre, pk=line['genre_id'])
-                title.genre.add(genre)
-            except Http404:
-                print('Title or genre does not exists')
+            title = Title.objects.filter(pk=line['title_id'])
+            if title.exists():
+                genre = Genre.objects.filter(pk=line['genre_id'])
+                if genre.exists():
+                    title[0].genre.add(genre[0])
+                else:
+                    print(f'Genre with id {line["genre_id"]} does not exists')
+            else:
+                print(f'Title with id {line["title_id"]} does not exists')

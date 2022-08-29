@@ -1,5 +1,3 @@
-from django.http import Http404
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Title, Review, User
 from rest_framework.validators import UniqueValidator
@@ -145,16 +143,10 @@ class ReviewSerializer(serializers.ModelSerializer):
                 self.context['request'].parser_context['kwargs']['title_id']
             )
             author = self.context['request'].user
-            try:
-                review = get_object_or_404(
-                    Review, author=author, title=title_id
-                )
-                if review is not None:
-                    raise serializers.ValidationError(
-                        'Пользователь может оставить только 1 отзыв '
-                        'на произведение')
-            except Http404:
-                pass
+            if Review.objects.filter(author=author, title=title_id).exists():
+                raise serializers.ValidationError(
+                    'Пользователь может оставить только 1 отзыв '
+                    'на произведение')
         return data
 
 

@@ -1,20 +1,7 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from reviews.validators import validate_year
-
-
-SCORES = [
-    (1, '1'),
-    (2, '2'),
-    (3, '3'),
-    (4, '4'),
-    (5, '5'),
-    (6, '6'),
-    (7, '7'),
-    (8, '8'),
-    (9, '9'),
-    (10, '10'),
-]
 
 
 class User(AbstractUser):
@@ -164,18 +151,15 @@ class Review(models.Model):
     )
     text = models.TextField('Текст отзыва')
     score = models.PositiveSmallIntegerField(
-        choices=SCORES,
         verbose_name='Оценка',
-        null=True
+        null=True,
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
     pub_date = models.DateTimeField(
         'Дата добавления',
         auto_now_add=True,
         db_index=True
     )
-
-    def __str__(self):
-        return self.text
 
     class Meta:
         verbose_name = 'Отзыв'
@@ -186,6 +170,10 @@ class Review(models.Model):
                 name='unique_title_author'
             )
         ]
+        ordering = ['-pub_date']
+
+    def __str__(self):
+        return self.text[:15]
 
 
 class Comment(models.Model):
@@ -208,9 +196,10 @@ class Comment(models.Model):
         db_index=True
     )
 
-    def __str__(self):
-        return self.text
-
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+        ordering = ['-pub_date']
+
+    def __str__(self):
+        return self.text[:15]
