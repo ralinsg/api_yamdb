@@ -11,31 +11,29 @@ from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework import viewsets
 from rest_framework.pagination import LimitOffsetPagination
-from .permissions import IsAdminOrSuperUser, IsAdminOrReadOnly
+from .permissions import IsAdminOrSuperUser
 from rest_framework.permissions import IsAuthenticated
+from django.conf import settings
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([AllowAny])
 def signup(request):
     serializer = SignUpSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        user = get_object_or_404(
-            User,
-            username=serializer.validated_data["username"], )
-        confirmation_code = default_token_generator.make_token(user)
-        send_mail(
-            subject="Sign Up",
-            message=f"Your confirmation code: {confirmation_code}",
-            from_email=None,
-            recipient_list=[user.email], )
-        Token.objects.create(user=user, token=confirmation_code)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    user, created = User.objects.get_or_create(serializer.data)
+    confirmation_code = default_token_generator.make_token(user)
+    send_mail(
+        subject="Sign Up",
+        message=f"Your confirmation code: {confirmation_code}",
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[user.email], )
+    Token.objects.create(user=user, token=confirmation_code)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([AllowAny])
 def jwt_token(request):
     serializer = JWTokenSerializer(data=request.data)
@@ -61,11 +59,6 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrSuperUser, )
     lookup_field = "username"
 
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return (IsAdminOrReadOnly(),)
-        return super().get_permissions()
-
     @action(
         methods=["GET", "PATCH"],
         url_path="me",
@@ -76,7 +69,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def profile(self, request):
         user = User.objects.get(username=request.user.username)
         serializer = self.get_serializer(user, many=False)
-        if request.method == 'GET':
+        if request.method == "GET":
             return Response(serializer.data, status=status.HTTP_200_OK)
         serializer = self.get_serializer(user, data=request.data, partial=True)
         if serializer.is_valid():

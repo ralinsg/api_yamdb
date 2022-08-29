@@ -131,6 +131,14 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'emails')
 
-DEFAULT_FROM_EMAIL = 'admin@yamdb.com'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+EMAIL_HOST = 'smtp.yamdb.com'
+
+EMAIL_HOST_USER = 'admin@yamdb.com'
+
+EMAIL_HOST_PASSWORD = 'yamdbpass'
+
+EMAIL_PORT = 587
+
+EMAIL_USE_TLS = True
