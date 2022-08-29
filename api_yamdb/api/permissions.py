@@ -6,8 +6,8 @@ SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 class IsAuthenticatedOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if (request.method in SAFE_METHODS
-            or request.user.is_authenticated):
-                return True
+                or request.user.is_authenticated):
+            return True
         return False
 
 
@@ -38,6 +38,7 @@ class IsAuthorOrAdminOrModeratorOrReadOnly(permissions.BasePermission):
     или администратор.
     Для неавторизованных пользователей доступ только на чтение.
     """
+
     def has_permission(self, request, view):
         if (
             request.method in permissions.SAFE_METHODS
