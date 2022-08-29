@@ -20,26 +20,24 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title, Token, User
+from django.conf import settings
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def signup(request):
     serializer = SignUpSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        user = get_object_or_404(
-            User,
-            username=serializer.validated_data["username"], )
-        confirmation_code = default_token_generator.make_token(user)
-        send_mail(
-            subject="Sign Up",
-            message=f"Your confirmation code: {confirmation_code}",
-            from_email=None,
-            recipient_list=[user.email], )
-        Token.objects.create(user=user, token=confirmation_code)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    user, created = User.objects.get_or_create(serializer.data)
+    confirmation_code = default_token_generator.make_token(user)
+    send_mail(
+        subject='Sign Up',
+        message=f'Your confirmation code: {confirmation_code}',
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[user.email], )
+    Token.objects.create(user=user, token=confirmation_code)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -47,26 +45,35 @@ def signup(request):
 def jwt_token(request):
     serializer = JWTokenSerializer(data=request.data)
     if serializer.is_valid():
-        username = serializer.validated_data["username"]
+        username = serializer.validated_data['username']
         user = get_object_or_404(User, username=username,)
-        confirmation_code = serializer.validated_data["confirmation_code"]
+        confirmation_code = serializer.validated_data['confirmation_code']
         token = Token.objects.get(user=user)
         if confirmation_code == token.token:
             jwt_token = AccessToken.for_user(user)
             return Response(
-                {"token": str(jwt_token)}, status=status.HTTP_200_OK)
+                {'token': str(jwt_token)}, status=status.HTTP_200_OK)
         return Response(
-            {"error": "Your code is not valid"},
+            {'error': 'Your code is not valid'},
             status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):
+
+    """Получение списка пользователей
+    Добавление пользователя
+    Получение данных отдельного пользователя
+    Редактирование данных отдельного пользователя
+    Удаление пользователя
+    Получение данных личного профиля
+    Htlfrnbhjdfybt kbxyjuj ghjabkz"""
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsAdminOrSuperUser, )
-    lookup_field = "username"
+    lookup_field = 'username'
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -74,9 +81,9 @@ class UserViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     @action(
-        methods=["GET", "PATCH"],
-        url_path="me",
-        url_name="me",
+        methods=['GET', 'PATCH'],
+        url_path='me',
+        url_name='me',
         serializer_class=ProfileSerializer,
         permission_classes=(IsAuthenticated, ),
         detail=False, )
@@ -105,7 +112,7 @@ class CategoryViewSet(MyViewSet):
     permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
-    lookup_field = "slug"
+    lookup_field = 'slug'
     pagination_class = LimitOffsetPagination
 
 
