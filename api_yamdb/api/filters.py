@@ -3,7 +3,6 @@ from reviews.models import Title
 
 
 class GenreFilter(filters.FilterSet):
-
     """Фильтрация по полям связанных моделей."""
 
     name = filters.CharFilter(

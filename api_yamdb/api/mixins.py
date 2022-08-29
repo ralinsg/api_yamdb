@@ -18,9 +18,7 @@ class MyViewSet(
 
 
 class UpdateModelMixin(mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    """
-    Обновление возможно только методом PATCH.
-    """
+    """Обновление возможно только методом PATCH."""
 
     def update(self, *args, **kwargs):
         raise MethodNotAllowed('POST', detail='Use PATCH')
