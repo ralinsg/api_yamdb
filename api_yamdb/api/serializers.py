@@ -105,7 +105,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('__all__')
+        fields = '__all__'
 
 
 class ReadTitleSerializer(serializers.ModelSerializer):

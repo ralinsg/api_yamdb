@@ -14,8 +14,6 @@ class MyViewSet(
     Удаляет текущий экземпляр модели.
     """
 
-    pass
-
 
 class UpdateModelMixin(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """Обновление возможно только методом PATCH."""

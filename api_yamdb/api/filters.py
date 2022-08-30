@@ -18,6 +18,6 @@ class GenreFilter(filters.FilterSet):
         lookup_expr='icontains'
     )
 
-    class Meta():
+    class Meta:
         model = Title
-        fields = ('name', 'year', 'genre', 'category', )
+        fields = ('name', 'year', 'genre', 'category')

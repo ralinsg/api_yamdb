@@ -1,6 +1,5 @@
 from rest_framework import permissions
-
-SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
+from rest_framework.permissions import SAFE_METHODS
 
 
 class IsAuthenticatedOrReadOnly(permissions.BasePermission):
