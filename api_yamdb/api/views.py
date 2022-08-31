@@ -29,7 +29,7 @@ def signup(request):
     serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
-    user, created = User.objects.get_or_create(serializer.data)
+    user, _ = User.objects.get_or_create(serializer.data)
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
         subject='Sign Up',
@@ -88,11 +88,10 @@ class UserViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated, ),
         detail=False, )
     def profile(self, request):
-        user = User.objects.get(username=request.user.username)
-        serializer = self.get_serializer(user, many=False)
+        serializer = self.get_serializer(request.user, many=False)
         if request.method == 'GET':
             return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = self.get_serializer(user, data=request.data, partial=True)
+        serializer = self.get_serializer(request.user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
