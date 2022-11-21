@@ -48,3 +48,27 @@ SECRET_KEY=<Ваш секретный ключ>
 ```bash
  python3 manage.py runserver
 ```
+## Примеры запросов
+
+Добавление новой категории(POST-запрос).
+
+```bash
+http://127.0.0.1:8000/api/v1/categories/
+```
+
+Получение списка всех жанров(GET-запрос).
+
+```bash
+http://127.0.0.1:8000/api/v1/genres/
+```
+
+Частичное обновление информации о произведении(PATCH-запрос)
+ 
+ ```bash
+http://127.0.0.1:8000/api/v1/titles/{titles_id}/
+```
+## Автор
+
+- [@ralinsg](https://github.com/ralinsg)
+- [@alexeyseven](https://github.com/Alexeyseven)
+- [@elinagayduk](https://github.com/elinagayduk)
