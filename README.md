@@ -1,74 +1,132 @@
-
 # Проект YaMDb
 
+------------
+### Описание
 Проект YaMDb собирает отзывы (Review) пользователей на произведения (Titles).
 
-## Структура работы:
+------------
+### Технологии
+
+- asgiref==3.2.10
+- requests==2.26.0
+- django==2.2.16
+- djangorestframework==3.12.4
+- PyJWT==2.1.0
+- pytest==6.2.4
+- pytest-django==4.4.0
+- pytest-pythonpath==0.7.3
+- djangorestframework-simplejwt==4.7.2
+- django-filter==2.4.0
+- gunicorn==20.0.4
+- psycopg2-binary==2.8.6
+- pytz==2020.1
+- sqlparse==0.3.1
 
 
-## Технологический стек:
+------------
 
-- Python 3
-- Django
-- Django Rest Framework
-- PyJWT
-- Simple JWT
+### Как запустить проект:
 
-## Установка проекта:
-
-Клонировать репозиторий:
-
-```bash
- git clone git@github.com:ralinsg/api_yamdb.git
+Клонировать репозиторий и перейти в него в командной строке:
 
 ```
-Перейти в склонированный репозиторий:
-```bash
- cd api_final_yatube
+git clone git@github.com:ralinsg/infra_sp2.git
 ```
-Cоздать виртуальное окружение:
-```bash
-py -3.7 -m venv venv 
+
 ```
-Активировать виртуальное окружение:
-```bash
- source venv/Scripts/activate
+cd infra_sp2
 ```
+
+Cоздать и активировать виртуальное окружение:
+
+```
+py -3.7 -m venv env
+```
+
+```
+source venv/Scripts/activate
+```
+
+```
+python3 -m pip install --upgrade pip
+```
+
 Установить зависимости из файла requirements.txt:
-```bash
- pip install -r requirements.txt
+
 ```
-Создать файл .env со следующими данными:
-```bash
-SECRET_KEY=<Ваш секретный ключ>
+pip install -r requirements.txt
 ```
 
-## Запуск проекта:
+Переходим в папку с файлом docker-compose.yaml:
 
-```bash
- python3 manage.py runserver
 ```
-## Примеры запросов
+cd infra
+```
 
-Добавление новой категории(POST-запрос).
+Поднимаем контейнеры (db, web, nginx)
 
-```bash
+```
+docker-compose up -d --build
+```
+
+Выполнить миграции:
+
+```
+docker-compose exec web python manage.py migrate
+```
+
+Создаем суперпользователя:
+
+```
+docker-compose exec web python manage.py createsuperuser
+```
+
+Собираем статику:
+
+```
+docker-compose exec web python manage.py collectstatic --no-input
+```
+
+Создаем дамп (резервуню копию) базы:
+
+```
+docker-compose exec web python manage.py dumpdata > fixtures.json
+```
+
+Останавливаем контейнеры:
+
+```
+docker-compose down -v
+```
+
+Шаблон наполнения .env (не включен в текущий репозиторий) расположенный по пути infra/.env
+
+```
+SECRET_KEY='secret_key'
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+DB_HOST=db
+DB_PORT=5432
+```
+
+
+------------
+### Примеры запросов
+ Добавление новой категории(POST-запрос).
+```
 http://127.0.0.1:8000/api/v1/categories/
 ```
-
 Получение списка всех жанров(GET-запрос).
-
-```bash
+```
 http://127.0.0.1:8000/api/v1/genres/
 ```
-
 Частичное обновление информации о произведении(PATCH-запрос)
- 
- ```bash
+```
 http://127.0.0.1:8000/api/v1/titles/{titles_id}/
 ```
-## Автор
+------------
 
-- [@ralinsg](https://github.com/ralinsg)
-- [@alexeyseven](https://github.com/Alexeyseven)
-- [@elinagayduk](https://github.com/elinagayduk)
+### Авторы
+- Сергей Ралин
